@@ -12,7 +12,7 @@ from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDBService imp
     DayAndNightDBService,
 )
 
-@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.0")
+@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.1")
 class DayAndNight(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
