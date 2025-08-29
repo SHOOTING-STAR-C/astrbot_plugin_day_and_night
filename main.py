@@ -18,6 +18,7 @@ class DayAndNight(Star):
         super().__init__(context)
         morning_def_sup_prompt = "请祝用户早安然后告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
         night_def_sup_prompt = "请祝用户晚安，并根据入睡时间关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
+        stats_def_sup_prompt = "告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
 
         self.bf_data_path = StarTools.get_data_dir("day_and_night_tool_plugin")
         self.db = DayAndNightDataBase(self.bf_data_path)  # 初始化数据库
@@ -29,10 +30,12 @@ class DayAndNight(Star):
             logger.warning("DayAndNight: 未提供配置文件，将使用默认配置")
             self.morning_sup_prompt = morning_def_sup_prompt
             self.night_sup_prompt = night_def_sup_prompt
+            self.stats_sup_prompt = stats_def_sup_prompt
         else:
             logger.debug("DayAndNight: 使用用户配置文件")
             self.morning_sup_prompt = config.get("morning_sup_prompt", morning_def_sup_prompt)
             self.night_sup_prompt = config.get("night_sup_prompt", night_def_sup_prompt)
+            self.stats_sup_prompt = config.get("stats_sup_prompt", night_def_sup_prompt)
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
@@ -88,6 +91,26 @@ class DayAndNight(Star):
             error_night_prompt = f"用户{user_id}向你说晚安，结合人设祝用户晚安，可以考虑上下文，确保对话通顺不突兀"
             return error_night_prompt
 
+
+    @llm_tool(name = 'sleep_stats' )
+    async def sleep_stats(self, event: AstrMessageEvent):
+        """
+           用户获取昨天的睡眠情况时使用这个这个函数
+        """
+        # 获取用户
+        user_id = event.get_sender_id()
+        # 获取当前时间并计算昨天的日期
+        now = datetime.now()
+        from datetime import timedelta
+        yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+        sleep_info = await self.db_service.query_user_sleep_records(user_id, yesterday)
+        if sleep_info and sleep_info['wake_time']:
+            stats_prompt = f"用户{user_id}向你询问他昨日的睡眠情况，昨晚他{sleep_info['sleep_time']}入睡，今天{sleep_info['wake_time']}醒来，{self.stats_sup_prompt}"
+            logger.debug(stats_prompt)
+            return stats_prompt
+        else:
+            stats_prompt = f"用户{user_id}向你询问他昨天的睡眠情况，但是因为他昨晚没有说晚安或今天早上没有早安导致没有记录，结合人设让用户及时对你说早安晚安，可以考虑上下文，确保对话通顺不突兀"
+            return stats_prompt
 
 
     async def terminate(self):
