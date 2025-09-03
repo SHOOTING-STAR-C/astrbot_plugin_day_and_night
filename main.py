@@ -3,7 +3,7 @@ from astrbot.api.star import Context, Star, register , StarTools
 from astrbot.api import logger
 from astrbot.api.all import *
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDataBase import (
     DayAndNightDataBase,
@@ -12,7 +12,7 @@ from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDBService imp
     DayAndNightDBService,
 )
 
-@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.1")
+@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.2")
 class DayAndNight(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -111,6 +111,37 @@ class DayAndNight(Star):
         else:
             stats_prompt = f"用户{user_id}向你询问他昨天的睡眠情况，但是因为他昨晚没有说晚安或今天早上没有早安导致没有记录，结合人设让用户及时对你说早安晚安，可以考虑上下文，确保对话通顺不突兀"
             return stats_prompt
+
+
+    @llm_tool(name='modify_sleep_time_fuzzy')
+    async def modify_sleep_time_fuzzy(self, event: AstrMessageEvent,statis_date:str, sleep_str: str, wake_str: str):
+        """
+        用户修改入睡或醒来时间
+        示例：
+        - 我是早上八点醒的
+        - 我是昨晚上八点睡着的
+        - 修改我的入睡时间为今早8点
+        - 修改我的醒来时间为昨天晚上10点
+        Args:
+            statis_date(string): 修改哪天,没有就填None
+            sleep_str(string): 用户提供的入睡时间(%Y-%m-%d %H:%M:%S),没有就填None
+            wake_str(string): 用户提供的醒来时间(%Y-%m-%d %H:%M:%S),没有就填None
+        Returns:
+            str: 修改结果的提示信息。
+        """
+        user_id = event.get_sender_id()
+
+        # 判断是修改入睡时间还是醒来时间
+        if sleep_str:
+            line = await self.db_service.update_custom_sleep_time(user_id, statis_date, sleep_str)
+            if line > 0:
+                return f"已将{user_id}的入睡时间修改为{sleep_str}"
+        if wake_str:
+            line = await self.db_service.update_custom_wake_time(user_id, statis_date, wake_str)
+            if line > 0:
+                return f"已将{user_id}的醒来时间修改为{wake_str}"
+
+        return "修改失败，请确认输入格式是否正确。"
 
 
     async def terminate(self):

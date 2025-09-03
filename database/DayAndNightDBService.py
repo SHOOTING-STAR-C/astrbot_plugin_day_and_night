@@ -35,3 +35,23 @@ class DayAndNightDBService:
               and status_date = ?
             """,
             (user_id, status_date))
+    async def update_custom_sleep_time(self, user_id: str, status_date: str, sleep_time: str) -> int:
+        """修改用户的入睡时间，如果记录不存在则插入一条新记录"""
+        return await self.db.exec_sql(
+            """
+            INSERT INTO user_sleep_records (user_id, sleep_time, status_date)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id, status_date) DO UPDATE SET sleep_time = excluded.sleep_time
+            """,
+            (user_id, sleep_time, status_date),
+        )
+
+    async def update_custom_wake_time(self, user_id: str, status_date: str, wake_time: str) -> int:
+        """修改用户的醒来时间，如果记录不存在则插入一条新记录"""
+        return await self.db.exec_sql(
+            """
+            INSERT INTO user_sleep_records (user_id, wake_time, status_date)
+            VALUES (?, ?, ?)
+            ON CONFLICT(user_id, status_date) DO UPDATE SET wake_time = excluded.wake_time
+            """,
+            (user_id, wake_time, status_date))
