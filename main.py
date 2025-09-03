@@ -12,7 +12,7 @@ from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDBService imp
     DayAndNightDBService,
 )
 
-@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.2")
+@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.3")
 class DayAndNight(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -114,7 +114,7 @@ class DayAndNight(Star):
 
 
     @llm_tool(name='modify_sleep_time_fuzzy')
-    async def modify_sleep_time_fuzzy(self, event: AstrMessageEvent,statis_date:str, sleep_str: str, wake_str: str):
+    async def modify_sleep_time_fuzzy(self, event: AstrMessageEvent, statis_date:str, sleep_str: str = None, wake_str: str = None) -> str:
         """
         用户修改入睡或醒来时间
         示例：
