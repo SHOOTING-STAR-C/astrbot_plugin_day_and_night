@@ -1,4 +1,4 @@
-from typing import Optional, Dict
+from typing import Optional, Dict,List
 
 from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDataBase import (
     DayAndNightDataBase,
@@ -55,3 +55,22 @@ class DayAndNightDBService:
             ON CONFLICT(user_id, status_date) DO UPDATE SET wake_time = excluded.wake_time
             """,
             (user_id, wake_time, status_date))
+
+    async def statis_sleep_data(self, user_id: str, start_date: str,end_date:str) -> Optional[List[Dict]]:
+        """统计用户时间段内的睡眠数据"""
+        return await self.db.query(
+            """
+            SELECT
+                status_date AS status_date,
+                sleep_time as sleep_time,
+                wake_time as wake_time,
+                CAST((JULIANDAY(wake_time) - JULIANDAY(sleep_time)) * 24 * 60 AS INTEGER) AS sleep_duration_minutes
+            FROM user_sleep_records
+            WHERE user_id = ?
+              AND sleep_time IS NOT NULL
+              AND wake_time IS NOT NULL
+              AND status_date between ? and ?
+            """,
+            (user_id, start_date,end_date),
+            fetch_all=True,
+        )

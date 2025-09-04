@@ -1,9 +1,11 @@
-from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
+from astrbot.api.event import AstrMessageEvent
 from astrbot.api.star import Context, Star, register , StarTools
 from astrbot.api import logger
 from astrbot.api.all import *
 
 from datetime import datetime, timedelta
+from typing import Optional, Dict
+
 
 from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDataBase import (
     DayAndNightDataBase,
@@ -12,7 +14,7 @@ from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDBService imp
     DayAndNightDBService,
 )
 
-@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.3")
+@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.4")
 class DayAndNight(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -42,7 +44,7 @@ class DayAndNight(Star):
         await self.db.initialize()  # 添加数据库初始化调用
 
 
-    @llm_tool(name = 'good_morning' )
+    @llm_tool(name = "good_morning" )
     async def good_morning(self,event: AstrMessageEvent):
         """
             用户说早安/早上好等醒来起床举动后调用这个方法获取用户的睡眠情况
@@ -51,7 +53,6 @@ class DayAndNight(Star):
         user_id = event.get_sender_id()
         # 获取当前时间并计算昨天的日期
         now = datetime.now()
-        from datetime import timedelta
         yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
         line = await self.db_service.update_wake_time(user_id, yesterday)
         sleep_info = await self.db_service.query_user_sleep_records(user_id, yesterday)
@@ -64,7 +65,7 @@ class DayAndNight(Star):
             return nt_morning_prompt
 
 
-    @llm_tool(name = 'good_night' )
+    @llm_tool(name = "good_night" )
     async def good_night(self, event: AstrMessageEvent):
         """
             用户说晚安或睡觉了或其他入睡举动后使用这个工具记录用户入睡时间
@@ -92,7 +93,7 @@ class DayAndNight(Star):
             return error_night_prompt
 
 
-    @llm_tool(name = 'sleep_stats' )
+    @llm_tool(name = "sleep_stats" )
     async def sleep_stats(self, event: AstrMessageEvent):
         """
            用户获取昨天的睡眠情况时使用这个这个函数
@@ -104,7 +105,7 @@ class DayAndNight(Star):
         from datetime import timedelta
         yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
         sleep_info = await self.db_service.query_user_sleep_records(user_id, yesterday)
-        if sleep_info and sleep_info['wake_time']:
+        if sleep_info and sleep_info["wake_time"]:
             stats_prompt = f"用户{user_id}向你询问他昨日的睡眠情况，昨晚他{sleep_info['sleep_time']}入睡，今天{sleep_info['wake_time']}醒来，{self.stats_sup_prompt}"
             logger.debug(stats_prompt)
             return stats_prompt
@@ -113,7 +114,7 @@ class DayAndNight(Star):
             return stats_prompt
 
 
-    @llm_tool(name='modify_sleep_time_fuzzy')
+    @llm_tool(name="modify_sleep_time_fuzzy")
     async def modify_sleep_time_fuzzy(self, event: AstrMessageEvent, statis_date:str, sleep_str: str = None, wake_str: str = None) -> str:
         """
         用户修改入睡或醒来时间
@@ -142,6 +143,37 @@ class DayAndNight(Star):
                 return f"已将{user_id}的醒来时间修改为{wake_str}"
 
         return "修改失败，请确认输入格式是否正确。"
+
+
+    @llm_tool(name="statis_sleep_data")
+    async def statis_sleep_data(self, event: AstrMessageEvent, start_date: str, end_date: str) -> Optional[Dict]:
+        """
+        统计用户某个时间段的睡眠数据，尽量自己填参数不要询问用户
+        - 查询我最近7天的睡眠情况
+        - 查询一下我这周的睡眠情况
+        - 帮我统计一下我这个月的睡眠数据
+        - 查询我从2024-10-01到2024-10-07的睡眠情况
+        - 帮我统计一下我从2023-09-25到2023-10-01的睡眠数据
+        - 帮我统计一下我最近30天的睡眠数据
+        Args:
+            start_date (string): 统计开始日期，格式为 "YYYY-MM-DD"
+            end_date (string): 统计结束日期，格式为 "YYYY-MM-DD"
+        """
+        # 获取用户
+        user_id = event.get_sender_id()
+        sleep_data = await self.db_service.statis_sleep_data(user_id, start_date, end_date)
+
+        result_lines = []
+        logger.debug(sleep_data)
+        if sleep_data:
+            for sleep_record in sleep_data:
+                result_lines.append(f"日期: {sleep_record['status_date']}, 入睡: {sleep_record['sleep_time']}, 醒来: {sleep_record['wake_time']}, 时长: {sleep_record['sleep_duration_minutes']}")
+            # 将所有行拼接成一个完整的字符串
+            result = "\n".join(result_lines)
+            return f"用户{user_id}在{start_date}到{end_date}期间的睡眠记录:\n{result}"
+        else:
+            return f"用户{user_id}在{start_date}到{end_date}期间没有睡眠记录。"
+
 
 
     async def terminate(self):
