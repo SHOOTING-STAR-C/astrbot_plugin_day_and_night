@@ -1,6 +1,6 @@
 from typing import Optional, Dict,List
 
-from data.plugins.astrbot_plugin_day_and_night.database.SleepTrackerDataBase import (
+from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDataBase import (
     SleepTrackerDataBase,
 )
 

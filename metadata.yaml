@@ -1,5 +1,5 @@
 name: astrbot_plugin_sleep_tracker # 这是你的插件的唯一识别名。
-desc: 为 AstrBot 提供的一个简单早安&晚安插件 # 插件简短描述
-version: v0.5.4 # 插件版本号。格式：v1.1.1 或者 v1.1
+desc: 一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况 # 插件简短描述
+version: v0.5.6 # 插件版本号。格式：v1.1.1 或者 v1.1
 author: SHOOTING-STAR-C # 作者
-repo: https://github.com/SHOOTING-STAR-C/astrbot_plugin_day_and_night # 插件的仓库地址
+repo: https://github.com/SHOOTING-STAR-C/astrbot_plugin_sleep_tracker # 插件的仓库地址

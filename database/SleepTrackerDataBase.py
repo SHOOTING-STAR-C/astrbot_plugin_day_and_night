@@ -7,13 +7,13 @@ import aiosqlite
 import os
 
 class SleepTrackerDataBase:
-    bf_db_name = "day_and_night.db"
+    bf_db_name = "sleep_tracker.db"
 
     def __init__(self, bf_db_path: str = None):
         super().__init__()
         if bf_db_path is None:
             self.bf_db_path = (
-                    StarTools.get_data_dir("day_and_night_tool_plugin") / self.bf_db_name
+                    StarTools.get_data_dir("sleep_tracker_tool_plugin") / self.bf_db_name
             )
         else:
             self.bf_db_path = bf_db_path / self.bf_db_name

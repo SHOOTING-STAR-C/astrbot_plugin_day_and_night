@@ -7,14 +7,14 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict
 
 
-from data.plugins.astrbot_plugin_day_and_night.database.SleepTrackerDataBase import (
+from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDataBase import (
     SleepTrackerDataBase,
 )
-from data.plugins.astrbot_plugin_day_and_night.database.SleepTrackerDBService import (
+from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService import (
     SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.5")
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.6")
 class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -22,7 +22,7 @@ class SleepTracker(Star):
         night_def_sup_prompt = "请祝用户晚安，并根据入睡时间关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
         stats_def_sup_prompt = "告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
 
-        self.bf_data_path = StarTools.get_data_dir("day_and_night_tool_plugin")
+        self.bf_data_path = StarTools.get_data_dir("sleep_tracker_tool_plugin")
         self.db = SleepTrackerDataBase(self.bf_data_path)  # 初始化数据库
         self.db_service = SleepTrackerDBService(self.db)  # 初始化数据库服务
 
