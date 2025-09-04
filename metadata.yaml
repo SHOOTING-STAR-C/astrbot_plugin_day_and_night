@@ -1,4 +1,4 @@
-name: astrbot_plugin_day_and_night # 这是你的插件的唯一识别名。
+name: astrbot_plugin_sleep_tracker # 这是你的插件的唯一识别名。
 desc: 为 AstrBot 提供的一个简单早安&晚安插件 # 插件简短描述
 version: v0.5.4 # 插件版本号。格式：v1.1.1 或者 v1.1
 author: SHOOTING-STAR-C # 作者

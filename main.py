@@ -7,15 +7,15 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict
 
 
-from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDataBase import (
-    DayAndNightDataBase,
+from data.plugins.astrbot_plugin_day_and_night.database.SleepTrackerDataBase import (
+    SleepTrackerDataBase,
 )
-from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDBService import (
-    DayAndNightDBService,
+from data.plugins.astrbot_plugin_day_and_night.database.SleepTrackerDBService import (
+    SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_day_and_night", "SHOOTING-STAR-C", "为 AstrBot 提供的一个简单早安&晚安插件", "v0.5.4")
-class DayAndNight(Star):
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.5")
+class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
         morning_def_sup_prompt = "请祝用户早安然后告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
@@ -23,18 +23,18 @@ class DayAndNight(Star):
         stats_def_sup_prompt = "告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
 
         self.bf_data_path = StarTools.get_data_dir("day_and_night_tool_plugin")
-        self.db = DayAndNightDataBase(self.bf_data_path)  # 初始化数据库
-        self.db_service = DayAndNightDBService(self.db)  # 初始化数据库服务
+        self.db = SleepTrackerDataBase(self.bf_data_path)  # 初始化数据库
+        self.db_service = SleepTrackerDBService(self.db)  # 初始化数据库服务
 
         self.config = config
         # 防御性配置处理：如果config为None，使用默认值
         if config is None:
-            logger.warning("DayAndNight: 未提供配置文件，将使用默认配置")
+            logger.warning("SleepTracker: 未提供配置文件，将使用默认配置")
             self.morning_sup_prompt = morning_def_sup_prompt
             self.night_sup_prompt = night_def_sup_prompt
             self.stats_sup_prompt = stats_def_sup_prompt
         else:
-            logger.debug("DayAndNight: 使用用户配置文件")
+            logger.debug("SleepTracker: 使用用户配置文件")
             self.morning_sup_prompt = config.get("morning_sup_prompt", morning_def_sup_prompt)
             self.night_sup_prompt = config.get("night_sup_prompt", night_def_sup_prompt)
             self.stats_sup_prompt = config.get("stats_sup_prompt", night_def_sup_prompt)

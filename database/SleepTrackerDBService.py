@@ -1,11 +1,11 @@
 from typing import Optional, Dict,List
 
-from data.plugins.astrbot_plugin_day_and_night.database.DayAndNightDataBase import (
-    DayAndNightDataBase,
+from data.plugins.astrbot_plugin_day_and_night.database.SleepTrackerDataBase import (
+    SleepTrackerDataBase,
 )
 
-class DayAndNightDBService:
-    def __init__(self, db: DayAndNightDataBase):
+class SleepTrackerDBService:
+    def __init__(self, db: SleepTrackerDataBase):
         self.db = db
 
     async def query_user_sleep_records(self, user_id: str,status_date : str) -> Optional[Dict]:
