@@ -6,7 +6,7 @@ from astrbot.api import logger
 import aiosqlite
 import os
 
-class DayAndNightDataBase:
+class SleepTrackerDataBase:
     bf_db_name = "day_and_night.db"
 
     def __init__(self, bf_db_path: str = None):
@@ -23,7 +23,7 @@ class DayAndNightDataBase:
         """使用给定连接初始化数据库"""
         # 修复路径拼接，确保正确找到 SQL 文件
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        sql_path = os.path.join(current_dir, "sql", "day_and_night_tool_plugin_init.sql")
+        sql_path = os.path.join(current_dir, "sql", "sleep_tracker_tool_plugin_init.sql")
 
         logger.debug(f"尝试从路径加载初始化SQL: {sql_path}")
 
@@ -49,14 +49,14 @@ class DayAndNightDataBase:
 
     async def initialize(self):
         """异步初始化数据库"""
-        logger.debug("开始初始化早&晚安工具数据库...")
+        logger.debug("开始初始化早安&晚安工具数据库...")
         # 先获取主连接
         self._conn = await self._get_conn()
         logger.debug(f"数据库连接已建立: {self._conn}")
 
         # 使用主连接初始化表结构
         await self._init_db(self._conn)
-        logger.debug("早&晚安工具数据库初始化完成")
+        logger.debug("早安&晚安工具数据库初始化完成")
 
     async def _get_conn(self) -> aiosqlite.Connection:
         """获取异步数据库连接(复用现有连接或创建新连接)

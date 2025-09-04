@@ -1,18 +1,33 @@
-# astrbot_plugin_day_and_night
+# astrbot_plugin_sleep_tracker
 
-# ✨Astrbot 早&晚安记录插件
+# ✨Astrbot 早安&晚安记录插件
 [![License](https://img.shields.io/badge/License-AGPL--3.0-green.svg)](https://opensource.org/licenses/AGPL-3.0)
 [![Python 3.8+](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://www.python.org/)
 [![AstrBot](https://img.shields.io/badge/AstrBot-3.4%2B-orange.svg)](https://github.com/Soulter/AstrBot)
 
-一个基于 Astrbot 的早&晚安插件：
+一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况。
 
-和bot说早&晚安记录睡眠情况
+## 🌟 和bot说早安&晚安
+- 📱 **简单易用** - 只需发送"早安"或"晚安"（理论上任何睡觉或醒来的语句都可以llm会自己调工具）
+- 📊 **数据统计** - 查看个人睡眠时长和作息规律
+- 📅 **灵活查询** - 支持查询指定日期或时间段的睡眠情况
+- 🔄 **自动计算** - 智能计算睡眠时长和作息质量
 
-已知问题：
-回笼觉和夜猫子🦉不能正常使用
 
-多次早晚安会刷新入睡时间和醒来时间（并非问题，那是人的问题😝）
+支持查询指定日期或时间段的睡眠情况
+比如：
+<div>
+  <img src="https://s21.ax1x.com/2025/09/04/pVgbpcV.png" width="45%" alt="bfv战绩查询效果"/>
+  <br>
+  <img src="https://s21.ax1x.com/2025/09/04/pVgb9XT.png" width="45%" alt="bf1战绩查询效果"/>
+</div>
+
+## ⚠️ 已知问题
+- **回笼觉和夜猫子🦉**: 不能正常使用
+
+- **多次早晚安**： 会刷新入睡时间和醒来时间
+
+> 💡 我正在努力解决这些问题，欢迎提供解决方案或建议！
 
 
 
