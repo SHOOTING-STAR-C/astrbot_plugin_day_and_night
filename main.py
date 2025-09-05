@@ -14,7 +14,7 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.6")
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.7")
 class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -94,28 +94,32 @@ class SleepTracker(Star):
 
 
     @llm_tool(name = "sleep_stats" )
-    async def sleep_stats(self, event: AstrMessageEvent):
+    async def sleep_stats(self, event: AstrMessageEvent,statis_date:str = None):
         """
            用户获取昨天的睡眠情况时使用这个这个函数
+            Args:
+                statis_date(string)，指定查询某天的睡眠情况，没指定就填None
         """
         # 获取用户
         user_id = event.get_sender_id()
         # 获取当前时间并计算昨天的日期
         now = datetime.now()
         from datetime import timedelta
-        yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-        sleep_info = await self.db_service.query_user_sleep_records(user_id, yesterday)
+        if not statis_date:
+            yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+            statis_date = yesterday
+        sleep_info = await self.db_service.query_user_sleep_records(user_id, statis_date)
         if sleep_info and sleep_info["wake_time"]:
-            stats_prompt = f"用户{user_id}向你询问他昨日的睡眠情况，昨晚他{sleep_info['sleep_time']}入睡，今天{sleep_info['wake_time']}醒来，{self.stats_sup_prompt}"
+            stats_prompt = f"用户{user_id}向你询问他{statis_date}的睡眠情况，{statis_date}他{sleep_info['sleep_time']}入睡，今天{sleep_info['wake_time']}醒来，{self.stats_sup_prompt}"
             logger.debug(stats_prompt)
             return stats_prompt
         else:
-            stats_prompt = f"用户{user_id}向你询问他昨天的睡眠情况，但是因为他昨晚没有说晚安或今天早上没有早安导致没有记录，结合人设让用户及时对你说早安晚安，可以考虑上下文，确保对话通顺不突兀"
+            stats_prompt = f"用户{user_id}向你询问他{statis_date}的睡眠情况，但是因为他{statis_date}没有说晚安或今天早上没有早安导致没有记录，结合人设让用户及时对你说早安晚安，可以考虑上下文，确保对话通顺不突兀"
             return stats_prompt
 
 
     @llm_tool(name="modify_sleep_time_fuzzy")
-    async def modify_sleep_time_fuzzy(self, event: AstrMessageEvent, statis_date:str, sleep_str: str = None, wake_str: str = None) -> str:
+    async def modify_sleep_time_fuzzy(self, event: AstrMessageEvent, statis_date:str, sleep_str: str = None, wake_str: str = None,modify_user_id:str=None) -> str:
         """
         用户修改入睡或醒来时间
         示例：
@@ -127,10 +131,18 @@ class SleepTracker(Star):
             statis_date(string): 修改哪天,没有就填None
             sleep_str(string): 用户提供的入睡时间(%Y-%m-%d %H:%M:%S),没有就填None
             wake_str(string): 用户提供的醒来时间(%Y-%m-%d %H:%M:%S),没有就填None
+            modify_user_id(string): 用户修改其他人的睡眠时间时候填写被修改用户的id，没有就填None
         Returns:
             str: 修改结果的提示信息。
         """
-        user_id = event.get_sender_id()
+        if modify_user_id:
+            if event.is_admin():
+                user_id = modify_user_id
+            else:
+                return "仅管理员可修改其他人的睡眠时间，普通用户只能修改自己的睡眠时间"
+        else:
+            user_id = event.get_sender_id()
+
 
         # 判断是修改入睡时间还是醒来时间
         if sleep_str:
