@@ -145,14 +145,17 @@ class SleepTracker(Star):
 
 
         # 判断是修改入睡时间还是醒来时间
+        results = []
         if sleep_str:
             line = await self.db_service.update_custom_sleep_time(user_id, statis_date, sleep_str)
             if line > 0:
-                return f"已将{user_id}的入睡时间修改为{sleep_str}"
+                results.append(f"已将{user_id}的入睡时间修改为{sleep_str}")
         if wake_str:
             line = await self.db_service.update_custom_wake_time(user_id, statis_date, wake_str)
             if line > 0:
-                return f"已将{user_id}的醒来时间修改为{wake_str}"
+                results.append(f"已将{user_id}的醒来时间修改为{wake_str}")
+        if results:
+            return "\n".join(results)
 
         return "修改失败，请确认输入格式是否正确。"
 
