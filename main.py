@@ -14,7 +14,7 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.7")
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.8")
 class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -94,14 +94,16 @@ class SleepTracker(Star):
 
 
     @llm_tool(name = "sleep_stats" )
-    async def sleep_stats(self, event: AstrMessageEvent,statis_date:str = None):
+    async def sleep_stats(self, event: AstrMessageEvent,statis_date:str = None,user_id:str=None):
         """
            用户获取昨天的睡眠情况时使用这个这个函数
             Args:
                 statis_date(string)，指定查询某天的睡眠情况，没指定就填None
+                user_id(string)，查询其他人时填写的用户id，没指定就填None
         """
-        # 获取用户
-        user_id = event.get_sender_id()
+        if not user_id:
+            # 获取用户
+            user_id = event.get_sender_id()
         # 获取当前时间并计算昨天的日期
         now = datetime.now()
         from datetime import timedelta
