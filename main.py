@@ -104,7 +104,6 @@ class SleepTracker(Star):
         if not user_id:
             # 获取用户
             user_id = event.get_sender_id()
-        # 获取当前时间并计算昨天的日期
         now = datetime.now()
         from datetime import timedelta
         if not statis_date:
