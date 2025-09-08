@@ -14,7 +14,7 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.9")
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.10")
 class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -98,7 +98,7 @@ class SleepTracker(Star):
         """
            用户获取昨天的睡眠情况时使用这个这个函数
             Args:
-                statis_date(string)，指定查询某天的睡眠情况，没指定就填None
+                statis_date(string)，指定查询某天的睡眠情况,(%Y-%m-%d)严格按照这个格式填写，没指定就填None
                 user_id(string)，查询其他人时填写的用户id，没指定就填None
         """
         if not user_id:
@@ -129,9 +129,9 @@ class SleepTracker(Star):
         - 修改我的入睡时间为今早8点
         - 修改我的醒来时间为昨天晚上10点
         Args:
-            statis_date(string): 修改哪天（必填，注意醒来时间是记录-1天的）
-            sleep_str(string): 用户提供的入睡时间(%Y-%m-%d %H:%M:%S),没有就填None
-            wake_str(string): 用户提供的醒来时间(%Y-%m-%d %H:%M:%S),没有就填None
+            statis_date(string): 修改哪天(Y-%m-%d)必填,严格按照这个格式填写,注意醒来时间是记录-1天的
+            sleep_str(string): 用户提供的入睡时间(%Y-%m-%d %H:%M:%S),严格按照这个格式填写,没有就填None
+            wake_str(string): 用户提供的醒来时间(%Y-%m-%d %H:%M:%S),严格按照这个格式填写,没有就填None
             modify_user_id(string): 用户修改其他人的睡眠时间时候填写被修改用户的id，没有就填None
         Returns:
             str: 修改结果的提示信息。
@@ -172,8 +172,8 @@ class SleepTracker(Star):
         - 帮我统计一下我从2023-09-25到2023-10-01的睡眠数据
         - 帮我统计一下我最近30天的睡眠数据
         Args:
-            start_date (string): 统计开始日期，格式为 "YYYY-MM-DD"
-            end_date (string): 统计结束日期，格式为 "YYYY-MM-DD"
+            start_date (string): 统计开始日期，格式为 "%Y-%m-%d"
+            end_date (string): 统计结束日期，格式为 "%Y-%m-%d"
         """
         # 获取用户
         user_id = event.get_sender_id()
