@@ -14,7 +14,7 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.8")
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.9")
 class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
@@ -129,7 +129,7 @@ class SleepTracker(Star):
         - 修改我的入睡时间为今早8点
         - 修改我的醒来时间为昨天晚上10点
         Args:
-            statis_date(string): 修改哪天,没有就填None
+            statis_date(string): 修改哪天（必填，注意醒来时间是记录-1天的）
             sleep_str(string): 用户提供的入睡时间(%Y-%m-%d %H:%M:%S),没有就填None
             wake_str(string): 用户提供的醒来时间(%Y-%m-%d %H:%M:%S),没有就填None
             modify_user_id(string): 用户修改其他人的睡眠时间时候填写被修改用户的id，没有就填None
