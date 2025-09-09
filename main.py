@@ -14,13 +14,14 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     SleepTrackerDBService,
 )
 
-@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v0.5.10")
+@register("astrbot_plugin_sleep_tracker", "SHOOTING-STAR-C", "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况", "v1.0.0")
 class SleepTracker(Star):
     def __init__(self, context: Context,config: AstrBotConfig = None):
         super().__init__(context)
-        morning_def_sup_prompt = "请祝用户早安然后告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
-        night_def_sup_prompt = "请祝用户晚安，并根据入睡时间关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
-        stats_def_sup_prompt = "告知用户的睡眠信息（包含入睡时间、醒来时间、睡眠时常）并关心一下用户的睡眠健康，确保符合人设并考虑上下文，确保对话通顺不突兀"
+        morning_def_sup_prompt = "用温暖亲切的语气祝用户早安，先问候再告知睡眠数据（入睡时间、醒来时间、睡眠时长），根据睡眠时长给出具体建议，确保符合人设并考虑上下文，确保对话通顺不突兀"
+        night_def_sup_prompt = "用温柔的语气祝用户晚安，根据当前时间给出睡眠建议，确保符合人设并考虑上下文，确保对话通顺不突兀"
+        stats_def_sup_prompt = "先清晰汇报指定日期的睡眠数据（日期、入睡时间、醒来时间、睡眠时长），然后分析睡眠质量（优秀/良好/需改进），给出具体的改善建议，最后表达关心，确保符合人设并考虑上下文，确保对话通顺不突兀"
+        statis_def_sup_prompt = "汇报时间段内的睡眠统计数据（平均睡眠时长、最早/最晚入睡时间、睡眠规律性），分析睡眠趋势和规律，指出需要改进的地方，给出周期性的健康建议，确保符合人设并考虑上下文，确保对话通顺不突兀"
 
         self.bf_data_path = StarTools.get_data_dir("sleep_tracker_tool_plugin")
         self.db = SleepTrackerDataBase(self.bf_data_path)  # 初始化数据库
@@ -33,11 +34,13 @@ class SleepTracker(Star):
             self.morning_sup_prompt = morning_def_sup_prompt
             self.night_sup_prompt = night_def_sup_prompt
             self.stats_sup_prompt = stats_def_sup_prompt
+            self.statis_sup_prompt = statis_def_sup_prompt
         else:
             logger.debug("SleepTracker: 使用用户配置文件")
             self.morning_sup_prompt = config.get("morning_sup_prompt", morning_def_sup_prompt)
             self.night_sup_prompt = config.get("night_sup_prompt", night_def_sup_prompt)
-            self.stats_sup_prompt = config.get("stats_sup_prompt", night_def_sup_prompt)
+            self.stats_sup_prompt = config.get("stats_sup_prompt", stats_def_sup_prompt)
+            self.statis_sup_prompt = config.get("statis_sup_prompt", statis_def_sup_prompt)
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
@@ -96,7 +99,7 @@ class SleepTracker(Star):
     @llm_tool(name = "sleep_stats" )
     async def sleep_stats(self, event: AstrMessageEvent,statis_date:str = None,user_id:str=None):
         """
-           用户获取昨天的睡眠情况时使用这个这个函数
+           用户获取某天的睡眠情况时使用这个这个函数
             Args:
                 statis_date(string)，指定查询某天的睡眠情况,(%Y-%m-%d)严格按照这个格式填写，没指定就填None
                 user_id(string)，查询其他人时填写的用户id，没指定就填None
@@ -186,9 +189,9 @@ class SleepTracker(Star):
                 result_lines.append(f"日期: {sleep_record['status_date']}, 入睡: {sleep_record['sleep_time']}, 醒来: {sleep_record['wake_time']}, 时长: {sleep_record['sleep_duration_minutes']}")
             # 将所有行拼接成一个完整的字符串
             result = "\n".join(result_lines)
-            return f"用户{user_id}在{start_date}到{end_date}期间的睡眠记录:\n{result}"
+            return f"{self.statis_sup_prompt}，用户{user_id}在{start_date}到{end_date}期间的睡眠记录:\n{result}"
         else:
-            return f"用户{user_id}在{start_date}到{end_date}期间没有睡眠记录。"
+            return f"用户{user_id}在{start_date}到{end_date}期间没有睡眠记录。提醒用户要记得跟你说早安&晚安"
 
 
 
