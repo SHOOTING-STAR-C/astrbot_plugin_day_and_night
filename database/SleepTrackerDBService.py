@@ -1,21 +1,25 @@
-from typing import Optional, Dict,List
+from typing import Optional, Dict, List
 
 from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDataBase import (
     SleepTrackerDataBase,
 )
 
+
 class SleepTrackerDBService:
     def __init__(self, db: SleepTrackerDataBase):
         self.db = db
 
-    async def query_user_sleep_records(self, user_id: str,status_date : str) -> Optional[Dict]:
+    async def query_user_sleep_records(
+        self, user_id: str, status_date: str
+    ) -> Optional[Dict]:
         """查询用户昨天睡眠信息"""
         return await self.db.query(
             "SELECT * FROM user_sleep_records WHERE user_id = ? and status_date = ?",
-            (user_id,status_date),
+            (user_id, status_date),
             fetch_all=False,
         )
-    async def insert_user_sleep_records(self, user_id: str,status_date : str) -> int:
+
+    async def insert_user_sleep_records(self, user_id: str, status_date: str) -> int:
         """记录&更新用户入睡时间"""
         return await self.db.exec_sql(
             """
@@ -25,7 +29,8 @@ class SleepTrackerDBService:
             """,
             (user_id, status_date),
         )
-    async def update_wake_time(self, user_id: str, status_date : str) -> int:
+
+    async def update_wake_time(self, user_id: str, status_date: str) -> int:
         """记录用户醒来时间"""
         return await self.db.exec_sql(
             """
@@ -34,8 +39,12 @@ class SleepTrackerDBService:
             where user_id = ?
               and status_date = ?
             """,
-            (user_id, status_date))
-    async def update_custom_sleep_time(self, user_id: str, status_date: str, sleep_time: str) -> int:
+            (user_id, status_date),
+        )
+
+    async def update_custom_sleep_time(
+        self, user_id: str, status_date: str, sleep_time: str
+    ) -> int:
         """修改用户的入睡时间，如果记录不存在则插入一条新记录"""
         return await self.db.exec_sql(
             """
@@ -46,7 +55,9 @@ class SleepTrackerDBService:
             (user_id, sleep_time, status_date),
         )
 
-    async def update_custom_wake_time(self, user_id: str, status_date: str, wake_time: str) -> int:
+    async def update_custom_wake_time(
+        self, user_id: str, status_date: str, wake_time: str
+    ) -> int:
         """修改用户的醒来时间，如果记录不存在则插入一条新记录"""
         return await self.db.exec_sql(
             """
@@ -54,9 +65,12 @@ class SleepTrackerDBService:
             VALUES (?, ?, ?)
             ON CONFLICT(user_id, status_date) DO UPDATE SET wake_time = excluded.wake_time
             """,
-            (user_id, wake_time, status_date))
+            (user_id, wake_time, status_date),
+        )
 
-    async def statis_sleep_data(self, user_id: str, start_date: str,end_date:str) -> Optional[List[Dict]]:
+    async def statis_sleep_data(
+        self, user_id: str, start_date: str, end_date: str
+    ) -> Optional[List[Dict]]:
         """统计用户时间段内的睡眠数据"""
         return await self.db.query(
             """
@@ -71,6 +85,6 @@ class SleepTrackerDBService:
               AND wake_time IS NOT NULL
               AND status_date between ? and ?
             """,
-            (user_id, start_date,end_date),
+            (user_id, start_date, end_date),
             fetch_all=True,
         )
