@@ -1,7 +1,7 @@
 from astrbot.api.event import AstrMessageEvent
 from astrbot.api.star import Context, Star, register, StarTools
 from astrbot.api import logger
-from astrbot.api.all import *
+from astrbot.api.all import llm_tool,AstrBotConfig
 
 from datetime import datetime, timedelta
 from typing import Optional, Dict
@@ -19,7 +19,7 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     "astrbot_plugin_sleep_tracker",
     "SHOOTING-STAR-C",
     "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况",
-    "v1.0.0",
+    "v1.0.1",
 )
 class SleepTracker(Star):
     # 默认提示词定义为类属性，提高代码整洁度和可维护性
