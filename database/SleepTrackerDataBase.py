@@ -1,7 +1,6 @@
 from typing import Tuple, Optional, Union, Dict, List
 from pathlib import Path
 from astrbot.api.star import StarTools
-# from astrbot.api.all import *
 from astrbot.api import logger
 
 import aiosqlite

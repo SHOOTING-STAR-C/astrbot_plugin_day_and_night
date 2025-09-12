@@ -19,7 +19,7 @@ from data.plugins.astrbot_plugin_sleep_tracker.database.SleepTrackerDBService im
     "astrbot_plugin_sleep_tracker",
     "SHOOTING-STAR-C",
     "一个基于 AstrBot 的睡眠记录插件，帮助用户记录和分析睡眠作息情况",
-    "v1.0.1",
+    "v1.0.2",
 )
 class SleepTracker(Star):
     # 默认提示词定义为类属性，提高代码整洁度和可维护性
@@ -161,9 +161,12 @@ class SleepTracker(Star):
         Returns:
             str: 修改结果的提示信息。
         """
+        sender_id = event.get_sender_id()
         if modify_user_id:
             if event.is_admin():
                 user_id = modify_user_id
+            elif sender_id == modify_user_id:
+                user_id = sender_id
             else:
                 return "仅管理员可修改其他人的睡眠时间，普通用户只能修改自己的睡眠时间"
         else:
